@@ -2,10 +2,10 @@
 - name: Assert supported VM platform
   ansible.builtin.assert:
     that:
-      - ansible_distribution == 'Ubuntu'
-      - ansible_distribution_version is version('24.04', '==')
-      - ansible_architecture in ['x86_64', 'aarch64']
-    fail_msg: "Требуется Ubuntu 24.04 на amd64 или arm64"
+      - ansible_distribution == "Ubuntu"
+      - ansible_distribution_version in ["24.04", "26.04"]
+      - ansible_architecture in ["x86_64", "aarch64"]
+    fail_msg: Requires Ubuntu Server 24.04 or 26.04 on amd64 or arm64
 
 - name: Install base packages and remote module dependencies
   ansible.builtin.apt:
@@ -21,23 +21,15 @@
     update_cache: true
     cache_valid_time: 3600
 
-- name: Enable amd64 image emulation on ARM VM
-  ansible.builtin.apt:
-    name: qemu-user-static
-    state: present
-  when: ansible_architecture == 'aarch64' and app_platform == 'linux/amd64'
-
-- name: Add Docker official repository
+- name: Add the official Docker APT repository
   ansible.builtin.deb822_repository:
     name: docker
     types: [deb]
     uris: https://download.docker.com/linux/ubuntu
     suites: "{{ ansible_distribution_release }}"
     components: [stable]
-    architectures:
-      - "{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}"
+    architectures: ["{{ {'x86_64': 'amd64', 'aarch64': 'arm64'}[ansible_architecture] }}"]
     signed_by: https://download.docker.com/linux/ubuntu/gpg
-    state: present
   register: docker_repository
 
 - name: Install Docker Engine
