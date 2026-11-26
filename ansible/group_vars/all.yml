@@ -1,7 +1,7 @@
 ---
 app_image: ghcr.io/kosheeta/devops-ci-app
-app_tag: "984660226ec746fa679740e9256683816a7318e1"
-app_platform: linux/amd64
+app_tag: "3b69362f7f62e03568078dd4fa20552ec1283249"
+app_platform: linux/arm64
 app_container_name: devops-ci-app
 app_host_port: 5000
 app_internal_port: 5000
